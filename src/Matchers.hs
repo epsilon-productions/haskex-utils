@@ -2,6 +2,7 @@ module Matchers where
 
 import Data
 
+-- | Documentation that sadad
 char :: Char -> Matcher
 char c = go
   where

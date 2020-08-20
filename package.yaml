@@ -1,5 +1,5 @@
 name: haskex-utils
-version: 0.1.0.0
+version: 0.0.0.0
 github: "epsilon-productions/haskex-utils"
 license: MIT
 author: "Epsilon Productions"
@@ -25,16 +25,16 @@ dependencies:
 library:
   source-dirs: src
 
-executables:
-  haskex-utils-exe:
-    main: Main.hs
-    source-dirs: app
-    ghc-options:
-      - -threaded
-      - -rtsopts
-      - -with-rtsopts=-N
-    dependencies:
-      - haskex-utils
+# executables:
+#   haskex-utils-exe:
+#     main: Main.hs
+#     source-dirs: app
+#     ghc-options:
+#       - -threaded
+#       - -rtsopts
+#       - -with-rtsopts=-N
+#     dependencies:
+#       - haskex-utils
 
 tests:
   haskex-utils-test:
