@@ -1,0 +1,64 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: e7462a2980cc4981c4e49abe9f30aecb5dd351b96df93b96633aa85b224113f7
+
+name:           haskex-utils
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/epsilon-productions/haskex-utils#readme>
+homepage:       https://github.com/epsilon-productions/haskex-utils#readme
+bug-reports:    https://github.com/epsilon-productions/haskex-utils/issues
+author:         Epsilon Productions
+maintainer:     not@available.com
+copyright:      2020 Epsilon Productions
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/epsilon-productions/haskex-utils
+
+library
+  exposed-modules:
+      Data
+      Lib
+      Matchers
+  other-modules:
+      Paths_haskex_utils
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable haskex-utils-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_haskex_utils
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , haskex-utils
+  default-language: Haskell2010
+
+test-suite haskex-utils-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_haskex_utils
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , haskex-utils
+  default-language: Haskell2010
