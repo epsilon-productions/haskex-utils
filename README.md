@@ -6,7 +6,7 @@ Parsing utility library written in haskell.
 
 ## Contributing
 
-Any help and contribution is greatly appreciated.
+Any help or contribution is greatly appreciated.
 
 ## License
 
