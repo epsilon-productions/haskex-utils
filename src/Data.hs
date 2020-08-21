@@ -8,6 +8,6 @@ type Matched = [Char]
 
 type Rest = [Char]
 
-data Match = Match Name Matched Rest [Match]
+data Match = Match Name Matched Rest [Match] deriving (Show, Eq)
 
 type Matcher = Input -> Maybe Match
