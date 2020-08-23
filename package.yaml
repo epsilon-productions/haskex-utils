@@ -36,13 +36,13 @@ library:
 #     dependencies:
 #       - haskex-utils
 
-tests:
-  haskex-utils-test:
-    main: Spec.hs
-    source-dirs: test
-    ghc-options:
-      - -threaded
-      - -rtsopts
-      - -with-rtsopts=-N
-    dependencies:
-      - haskex-utils
+# tests:
+#   haskex-utils-test:
+#     main: Spec.hs
+#     source-dirs: test
+#     ghc-options:
+#       - -threaded
+#       - -rtsopts
+#       - -with-rtsopts=-N
+#     dependencies:
+#       - haskex-utils
