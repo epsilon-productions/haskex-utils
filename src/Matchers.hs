@@ -15,7 +15,82 @@ where
 import Controls
 import Data
 import Data.List (stripPrefix)
-import Prelude hiding (any, not, until)
+import Numeric.Natural (Natural)
+import Prelude hiding (any, max, min, not, until)
+
+-- Generics
+----------------------------------------------------------------------------------------------------
+
+-- |
+-- A matcher which matches the next char if it passes the given test function
+--
+-- Examples:
+--
+-- >>> matchIf (\c -> c == 'h') "hello"
+-- Just (Match "h" "h" [])
+--
+-- >>> matchIf (const True) ""
+-- Nothing
+matchIf :: (Char -> Bool) -> Matcher
+matchIf _ [] = Nothing
+matchIf test (c : _) = if test c then Just $ Match [c] [c] [] else Nothing
+
+-- |
+-- A matcher which matches exactly n times with the given matcher
+--
+-- Examples:
+--
+-- >>> exactly 3 any $ "hello"
+-- Just (Match "hel" "hel" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" []])
+--
+-- >>> exactly 0 any $ "hello"
+-- Just (Match "" "" [])
+exactly :: Natural -> Matcher -> Matcher
+exactly n f = allOf $ replicate (fromEnum n) f
+
+-- |
+-- A matcher which matches at least n times with the given matcher
+--
+-- Examples:
+--
+-- >>> min 3 any $ "hello"
+-- Just (Match "hel" "hel" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" []])
+--
+-- >>> min 0 any $ "hello"
+-- Just (Match "" "" [])
+min :: Natural -> Matcher -> Matcher
+min n f i =
+  let matches = until f i in if length matches < fromEnum n then Nothing else Just $ merge matches
+
+-- |
+-- A matcher which matches at most n times with the given matcher
+--
+-- Examples:
+--
+-- >>> max 5 any $ "hello"
+-- Just (Match "hello" "hello" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" [],Match "l" "l" [],Match "o" "o" []])
+--
+-- >>> max 0 any $ "hello"
+-- Nothing
+max :: Natural -> Matcher -> Matcher
+max n f i =
+  let matches = until f i in if length matches <= fromEnum n then Just $ merge matches else Nothing
+
+-- |
+-- A matcher which matches at least n1 and at most n2 times with the given matcher
+--
+-- Examples:
+--
+-- >>> between 1 5 any $ "hello"
+-- Just (Match "hello" "hello" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" [],Match "l" "l" [],Match "o" "o" []])
+--
+-- >>> between 1 5 any $ ""
+-- Nothing
+--
+-- >>> between 5 1 any $ "hello"
+-- Nothing
+between :: Natural -> Natural -> Matcher -> Matcher
+between n1 n2 f i = (\_ -> max n2 f i) =<< min n1 f i
 
 -- |
 -- A matcher which matches the next char, whatever it is
@@ -161,6 +236,9 @@ as :: Matcher -> Name -> Matcher
 as f name i = case f i of
   Just (Match n m l) -> Just $ Match name m l
   _ -> Nothing
+
+-- Specific
+----------------------------------------------------------------------------------------------------
 
 -- Utils
 ----------------------------------------------------------------------------------------------------
