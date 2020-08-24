@@ -296,7 +296,7 @@ word :: Matcher
 word = oneOrMore letter
 
 -- |
--- A matcher which matches a word (one or more letters)
+-- A matcher which matches any whitespace char
 --
 -- Examples:
 --
