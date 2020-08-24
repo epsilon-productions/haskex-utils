@@ -108,6 +108,7 @@ oneOrMore f i = case until f i of
 --
 -- >>> (zeroOrMore $ string "ab") "abab"
 -- Just (Match "abab" "abab" [Match "ab" "ab" [],Match "ab" "ab" []])
+--
 -- >>> (zeroOrMore $ string "ab") "cdcd"
 -- Just (Match "" "cdcd" [])
 zeroOrMore :: Matcher -> Matcher
@@ -122,6 +123,7 @@ zeroOrMore f = optionally $ oneOrMore f
 --
 -- >>> (optionally $ char 'h') "hello world"
 -- Just (Match "h" "h" [])
+--
 -- >>> (optionally $ char 'e') "hello world"
 -- Just (Match "h" "h" [])
 optionally :: Matcher -> Matcher
@@ -139,6 +141,7 @@ optionally f i = case f i of
 --
 -- >>> (not $ char 'h') "hello world"
 -- Nothing
+--
 -- >>> (not $ char 'H') "hello world"
 -- Just (Match "" "" [])
 not :: Matcher -> Matcher
@@ -210,6 +213,7 @@ between n1 n2 f i = (\_ -> max n2 f i) =<< min n1 f i
 --
 -- >>> allOf [char 'h', char 'e', char 'l', char 'l', char 'o'] "hello world"
 -- Just (Match "hello" "hello" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" [],Match "l" "l" [],Match "o" "o" []])
+--
 -- >>> allOf [] "hello world"
 -- Just (Match "" "" [])
 allOf :: [Matcher] -> Matcher
@@ -229,6 +233,7 @@ allOf fs = \i -> case go fs [] i of
 --
 -- >>> anyOf [char 'a', char 'h', char 'b', char 'c'] "hello world"
 -- Just (Match "h" "h" [])
+--
 -- >>> anyOf [] "hello world"
 -- Just (Match "" "hello world" [])
 anyOf :: [Matcher] -> Matcher
@@ -284,6 +289,7 @@ letter = matchIf isLetter
 --
 -- >>> word "hello world"
 -- Just (Match "hello" "hello" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" [],Match "l" "l" [],Match "o" "o" []])
+--
 -- >>> word "a"
 -- Just (Match "a" "a" [Match "a" "a" []])
 word :: Matcher
@@ -296,6 +302,7 @@ word = oneOrMore letter
 --
 -- >>> whitespace " world"
 -- Just (Match " " " " [])
+--
 -- >>> whitespace "hello"
 -- Nothing
 whitespace :: Matcher
@@ -334,10 +341,13 @@ space = char ' '
 --
 -- >>> newline "\n"
 -- Just (Match "\n" "\n" [Match "\n" "\n" [],Match "" "" []])
+--
 -- >>> newline "\r"
 -- Just (Match "\r" "\r" [Match "\r" "\r" [],Match "" "" []])
+--
 -- >>> newline "\n\r"
 -- Just (Match "\n\r" "\n\r" [Match "\n" "\n" [],Match "\r" "\r" []])
+--
 -- >>> newline "\r\n"
 -- Just (Match "\r\n" "\r\n" [Match "\r" "\r" [],Match "\n" "\n" []])
 newline :: Matcher
@@ -356,6 +366,7 @@ newline =
 --
 -- >>> end ""
 -- Just (Match "" "" [])
+--
 -- >>> end "still something"
 -- Nothing
 end :: Matcher
