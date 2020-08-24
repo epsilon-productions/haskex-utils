@@ -1,19 +1,33 @@
 module Matchers
-  ( any,
+  ( matchIf,
+    any,
     char,
     string,
     oneOrMore,
     zeroOrMore,
     optionally,
     not,
+    exactly,
+    min,
+    max,
+    between,
     allOf,
     anyOf,
     as,
+    digit,
+    letter,
+    word,
+    whitespace,
+    tab,
+    space,
+    newline,
+    end,
   )
 where
 
 import Controls
 import Data
+import Data.Char (isDigit, isLetter, isSpace)
 import Data.List (stripPrefix)
 import Numeric.Natural (Natural)
 import Prelude hiding (any, max, min, not, until)
@@ -34,63 +48,6 @@ import Prelude hiding (any, max, min, not, until)
 matchIf :: (Char -> Bool) -> Matcher
 matchIf _ [] = Nothing
 matchIf test (c : _) = if test c then Just $ Match [c] [c] [] else Nothing
-
--- |
--- A matcher which matches exactly n times with the given matcher
---
--- Examples:
---
--- >>> exactly 3 any $ "hello"
--- Just (Match "hel" "hel" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" []])
---
--- >>> exactly 0 any $ "hello"
--- Just (Match "" "" [])
-exactly :: Natural -> Matcher -> Matcher
-exactly n f = allOf $ replicate (fromEnum n) f
-
--- |
--- A matcher which matches at least n times with the given matcher
---
--- Examples:
---
--- >>> min 3 any $ "hello"
--- Just (Match "hel" "hel" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" []])
---
--- >>> min 0 any $ "hello"
--- Just (Match "" "" [])
-min :: Natural -> Matcher -> Matcher
-min n f i =
-  let matches = until f i in if length matches < fromEnum n then Nothing else Just $ merge matches
-
--- |
--- A matcher which matches at most n times with the given matcher
---
--- Examples:
---
--- >>> max 5 any $ "hello"
--- Just (Match "hello" "hello" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" [],Match "l" "l" [],Match "o" "o" []])
---
--- >>> max 0 any $ "hello"
--- Nothing
-max :: Natural -> Matcher -> Matcher
-max n f i =
-  let matches = until f i in if length matches <= fromEnum n then Just $ merge matches else Nothing
-
--- |
--- A matcher which matches at least n1 and at most n2 times with the given matcher
---
--- Examples:
---
--- >>> between 1 5 any $ "hello"
--- Just (Match "hello" "hello" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" [],Match "l" "l" [],Match "o" "o" []])
---
--- >>> between 1 5 any $ ""
--- Nothing
---
--- >>> between 5 1 any $ "hello"
--- Nothing
-between :: Natural -> Natural -> Matcher -> Matcher
-between n1 n2 f i = (\_ -> max n2 f i) =<< min n1 f i
 
 -- |
 -- A matcher which matches the next char, whatever it is
@@ -190,7 +147,64 @@ not f i = case f i of
   _ -> any i
 
 -- |
--- A matcher which match if only all of the given matches match.
+-- A matcher which matches exactly n times with the given matcher
+--
+-- Examples:
+--
+-- >>> exactly 3 any $ "hello"
+-- Just (Match "hel" "hel" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" []])
+--
+-- >>> exactly 0 any $ "hello"
+-- Just (Match "" "" [])
+exactly :: Natural -> Matcher -> Matcher
+exactly n f = allOf $ replicate (fromEnum n) f
+
+-- |
+-- A matcher which matches at least n times with the given matcher
+--
+-- Examples:
+--
+-- >>> min 3 any $ "hello"
+-- Just (Match "hel" "hel" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" []])
+--
+-- >>> min 0 any $ "hello"
+-- Just (Match "" "" [])
+min :: Natural -> Matcher -> Matcher
+min n f i =
+  let matches = until f i in if length matches < fromEnum n then Nothing else Just $ merge matches
+
+-- |
+-- A matcher which matches at most n times with the given matcher
+--
+-- Examples:
+--
+-- >>> max 5 any $ "hello"
+-- Just (Match "hello" "hello" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" [],Match "l" "l" [],Match "o" "o" []])
+--
+-- >>> max 0 any $ "hello"
+-- Nothing
+max :: Natural -> Matcher -> Matcher
+max n f i =
+  let matches = until f i in if length matches <= fromEnum n then Just $ merge matches else Nothing
+
+-- |
+-- A matcher which matches with the given matcher a number of times between the given naturals
+--
+-- Examples:
+--
+-- >>> between 1 5 any $ "hello"
+-- Just (Match "hello" "hello" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" [],Match "l" "l" [],Match "o" "o" []])
+--
+-- >>> between 1 5 any $ ""
+-- Nothing
+--
+-- >>> between 5 1 any $ "hello"
+-- Nothing
+between :: Natural -> Natural -> Matcher -> Matcher
+between n1 n2 f i = (\_ -> max n2 f i) =<< min n1 f i
+
+-- |
+-- A matcher which match only if all of the given matches match.
 --
 -- Examples:
 --
@@ -239,6 +253,114 @@ as f name i = case f i of
 
 -- Specific
 ----------------------------------------------------------------------------------------------------
+
+-- |
+-- A matcher which matches a digit
+--
+-- Examples:
+--
+-- >>> digit "0"
+-- Just (Match "0" "0" [])
+digit :: Matcher
+digit = matchIf isDigit
+
+-- |
+-- A matcher which matches a letter
+--
+-- Examples:
+--
+-- >>> letter "a"
+-- Just (Match "a" "a" [])
+--
+-- >>> letter "A"
+-- Just (Match "A" "A" [])
+letter :: Matcher
+letter = matchIf isLetter
+
+-- |
+-- A matcher which matches a word (one or more letters)
+--
+-- Examples:
+--
+-- >>> word "hello world"
+-- Just (Match "hello" "hello" [Match "h" "h" [],Match "e" "e" [],Match "l" "l" [],Match "l" "l" [],Match "o" "o" []])
+-- >>> word "a"
+-- Just (Match "a" "a" [Match "a" "a" []])
+word :: Matcher
+word = oneOrMore letter
+
+-- |
+-- A matcher which matches a word (one or more letters)
+--
+-- Examples:
+--
+-- >>> whitespace " world"
+-- Just (Match " " " " [])
+-- >>> whitespace "hello"
+-- Nothing
+whitespace :: Matcher
+whitespace = matchIf isSpace
+
+-- |
+-- A matcher which matches a tab char
+--
+-- Examples:
+--
+-- >>> tab "\tworld"
+-- Just (Match "\t" "\t" [])
+tab :: Matcher
+tab = char '\t'
+
+-- |
+-- A matcher which matches a space char
+--
+-- Examples:
+--
+-- >>> space " world"
+-- Just (Match " " " " [])
+space :: Matcher
+space = char ' '
+
+-- |
+-- A matcher which matches a newline.
+--
+-- All kind of newlines are checked:
+-- - \n
+-- - \r
+-- - \n\r
+-- - \r\n
+--
+-- Examples:
+--
+-- >>> newline "\n"
+-- Just (Match "\n" "\n" [Match "\n" "\n" [],Match "" "" []])
+-- >>> newline "\r"
+-- Just (Match "\r" "\r" [Match "\r" "\r" [],Match "" "" []])
+-- >>> newline "\n\r"
+-- Just (Match "\n\r" "\n\r" [Match "\n" "\n" [],Match "\r" "\r" []])
+-- >>> newline "\r\n"
+-- Just (Match "\r\n" "\r\n" [Match "\r" "\r" [],Match "\n" "\n" []])
+newline :: Matcher
+newline =
+  anyOf
+    [ allOf [char '\r', char '\n'],
+      allOf [char '\n', char '\r'],
+      char '\n',
+      char '\r'
+    ]
+
+-- |
+-- A matcher which matches the end of the input, aka when the input has no more chars in it
+--
+-- Examples:
+--
+-- >>> end ""
+-- Just (Match "" "" [])
+-- >>> end "still something"
+-- Nothing
+end :: Matcher
+end [] = Just emptyMatch
+end (c : cs) = Nothing
 
 -- Utils
 ----------------------------------------------------------------------------------------------------
