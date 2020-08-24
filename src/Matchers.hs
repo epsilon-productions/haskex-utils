@@ -172,6 +172,9 @@ exactly n f = allOf $ replicate (fromEnum n) f
 --
 -- >>> min 0 any $ "hello"
 -- Just (Match "" "" [])
+--
+-- >>> min 6 any $ "hello"
+-- Nothing
 min :: Natural -> Matcher -> Matcher
 min n f i =
   let matches = until f i in if length matches < fromEnum n then Nothing else Just $ merge matches
