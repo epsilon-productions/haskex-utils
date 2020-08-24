@@ -36,7 +36,7 @@ import Prelude hiding (any, max, min, not, until)
 ----------------------------------------------------------------------------------------------------
 
 -- |
--- A matcher which matches the next char if it passes the given test function
+-- A matcher which matches the next char if it passes the given test function.
 --
 -- Examples:
 --
@@ -50,7 +50,7 @@ matchIf _ [] = Nothing
 matchIf test (c : _) = if test c then Just $ Match [c] [c] [] else Nothing
 
 -- |
--- A matcher which matches the next char, whatever it is
+-- A matcher which matches the next char, whatever it is.
 --
 -- Examples:
 --
@@ -64,7 +64,7 @@ any [] = Nothing
 any (c : r) = Just $ Match [c] [c] []
 
 -- |
--- A matcher which matches the given char
+-- A matcher which matches the given char.
 --
 -- Examples:
 --
@@ -74,7 +74,7 @@ char :: Char -> Matcher
 char c = string [c]
 
 -- |
--- A matcher which matches the given string
+-- A matcher which matches the given string.
 --
 -- Examples:
 --
@@ -115,7 +115,7 @@ zeroOrMore :: Matcher -> Matcher
 zeroOrMore f = optionally $ oneOrMore f
 
 -- |
--- A matcher which matches with the given matcher or matches nothing
+-- A matcher which matches with the given matcher or matches nothing.
 --
 -- Like ? quantifier.
 --
@@ -135,7 +135,7 @@ optionally f i = case f i of
 -- A matcher which invert the result of the given matcher.
 --
 -- - If the given matcher matches, it doesn't.
--- - If the given matcher doesn't match, it does (next char)
+-- - If the given matcher doesn't match, it does (next char).
 --
 -- Examples:
 --
@@ -150,7 +150,7 @@ not f i = case f i of
   _ -> any i
 
 -- |
--- A matcher which matches exactly n times with the given matcher
+-- A matcher which matches exactly n times with the given matcher.
 --
 -- Examples:
 --
@@ -163,7 +163,7 @@ exactly :: Natural -> Matcher -> Matcher
 exactly n f = allOf $ replicate (fromEnum n) f
 
 -- |
--- A matcher which matches at least n times with the given matcher
+-- A matcher which matches at least n times with the given matcher.
 --
 -- Examples:
 --
@@ -180,7 +180,7 @@ min n f i =
   let matches = until f i in if length matches < fromEnum n then Nothing else Just $ merge matches
 
 -- |
--- A matcher which matches at most n times with the given matcher
+-- A matcher which matches at most n times with the given matcher.
 --
 -- Examples:
 --
@@ -194,7 +194,7 @@ max n f i =
   let matches = until f i in if length matches <= fromEnum n then Just $ merge matches else Nothing
 
 -- |
--- A matcher which matches with the given matcher a number of times between the given naturals
+-- A matcher which matches with the given matcher a number of times between the given naturals.
 --
 -- Examples:
 --
@@ -210,7 +210,7 @@ between :: Natural -> Natural -> Matcher -> Matcher
 between n1 n2 f i = (\_ -> max n2 f i) =<< min n1 f i
 
 -- |
--- A matcher which match only if all of the given matches match.
+-- A matcher which matches only if all of the given matches match, in sequence.
 --
 -- Examples:
 --
@@ -230,7 +230,9 @@ allOf fs = \i -> case go fs [] i of
       _ -> Nothing
 
 -- |
--- A matcher which match if only all of the given matches match.
+-- A matcher which matches only if any of the given matches match.
+--
+-- Matchers order is important.
 --
 -- Examples:
 --
@@ -238,7 +240,7 @@ allOf fs = \i -> case go fs [] i of
 -- Just (Match "h" "h" [])
 --
 -- >>> anyOf [] "hello world"
--- Just (Match "" "hello world" [])
+-- Nothing
 anyOf :: [Matcher] -> Matcher
 anyOf fs = go fs
   where
@@ -248,7 +250,7 @@ anyOf fs = go fs
       _ -> go fs i
 
 -- |
--- A matcher with the produced match (if any) renamed with the given name
+-- A matcher with the produced match (if any) renamed with the given name.
 --
 -- Examples:
 --
@@ -263,7 +265,7 @@ as f name i = case f i of
 ----------------------------------------------------------------------------------------------------
 
 -- |
--- A matcher which matches a digit
+-- A matcher which matches a digit.
 --
 -- Examples:
 --
@@ -273,7 +275,7 @@ digit :: Matcher
 digit = matchIf isDigit
 
 -- |
--- A matcher which matches a letter
+-- A matcher which matches a letter.
 --
 -- Examples:
 --
@@ -286,7 +288,7 @@ letter :: Matcher
 letter = matchIf isLetter
 
 -- |
--- A matcher which matches a word (one or more letters)
+-- A matcher which matches a word (one or more letters).
 --
 -- Examples:
 --
@@ -299,7 +301,7 @@ word :: Matcher
 word = oneOrMore letter
 
 -- |
--- A matcher which matches any whitespace char
+-- A matcher which matches any whitespace char.
 --
 -- Examples:
 --
@@ -312,7 +314,7 @@ whitespace :: Matcher
 whitespace = matchIf isSpace
 
 -- |
--- A matcher which matches a tab char
+-- A matcher which matches a tab char.
 --
 -- Examples:
 --
@@ -322,7 +324,7 @@ tab :: Matcher
 tab = char '\t'
 
 -- |
--- A matcher which matches a space char
+-- A matcher which matches a space char.
 --
 -- Examples:
 --
@@ -335,10 +337,11 @@ space = char ' '
 -- A matcher which matches a newline.
 --
 -- All kind of newlines are checked:
--- - \n
--- - \r
--- - \n\r
--- - \r\n
+--
+-- - \\n
+-- - \\r
+-- - \\n\\r
+-- - \\r\\n
 --
 -- Examples:
 --
@@ -363,7 +366,7 @@ newline =
     ]
 
 -- |
--- A matcher which matches the end of the input, aka when the input has no more chars in it
+-- A matcher which matches the end of the input, aka when the input has no more chars in it.
 --
 -- Examples:
 --
@@ -379,7 +382,7 @@ end (c : cs) = Nothing
 -- Utils
 ----------------------------------------------------------------------------------------------------
 
--- | Apply the same matcher over on over on the input until no match is found, collecting
+-- | Apply the same matcher over on over on the input until no match is found, collecting.
 -- all the matches
 until :: Matcher -> Input -> [Match]
 until f = go []
@@ -388,7 +391,7 @@ until f = go []
       Just match -> go (matches ++ [match]) $ rest match r
       Nothing -> matches
 
--- | Merge the given matches in a parent match
+-- | Merge the given matches in a parent match.
 merge :: [Match] -> Match
 merge matches = go matches []
   where
