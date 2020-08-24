@@ -7,5 +7,5 @@ import Data
 -- as in:
 --
 -- >>> matcher `on` input
-on :: Matcher -> Input -> Maybe Match
+on :: Matcher -> Matcher
 on f = f
