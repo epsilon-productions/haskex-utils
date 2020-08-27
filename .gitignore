@@ -5,7 +5,7 @@
 .vscode
 
 # haskell specific
-*.cabal
+haskex-utils.cabal
 dist
 dist-*
 cabal-dev

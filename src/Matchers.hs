@@ -61,7 +61,7 @@ matchIf test (c : _) = if test c then Just $ Match [c] [c] [] else Nothing
 -- Nothing
 any :: Matcher
 any [] = Nothing
-any (c : r) = Just $ Match [c] [c] []
+any (c : _) = Just $ Match [c] [c] []
 
 -- |
 -- A matcher which matches the given char.
